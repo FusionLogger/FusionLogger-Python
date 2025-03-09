@@ -15,7 +15,6 @@ class FusionLogFormatter(object):
         return out
 
 
-
 def parse_template(template: str) -> list:
     tokens: list = list()
     position: int = 0
@@ -87,7 +86,8 @@ class FusionLogProcessor(metaclass=SingletonMeta):
     def __init__(self) -> None:
         self._queue = Queue()
 
-    def process_record(self, record: FusionLogRecord) -> None:
+    @staticmethod
+    def process_record(record: FusionLogRecord) -> None:
         """
         Verarbeitet einzelne LogRecords (muss überschrieben werden).
 
@@ -102,3 +102,7 @@ class FusionLogProcessor(metaclass=SingletonMeta):
         """
         out: str = record.logger.formatter.apply_template(record)
         print(out)
+        for file in record.files:
+            with open(file, "a", encoding="utf-8") as opened_file:
+                opened_file.write(out)
+                opened_file.write("\n")

@@ -42,7 +42,7 @@ from fusion_logger.defs import FusionLogLevel, FusionLogRecord
 from fusion_logger.processors import FusionLogFormatter, FusionLogProcessor
 
 
-class FusionLogger():
+class FusionLogger:
     """
     Zentrale Logging-Komponente mit konfigurierbaren Scopes und Leveln.
 
@@ -65,6 +65,7 @@ class FusionLogger():
         self.hostname: str = socket.gethostname()
         self.pid: int = os.getpid()
         self.tid: int = threading.current_thread().ident
+        self.log_files: set = set()
 
     # Outer methods
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -159,7 +160,8 @@ class FusionLogger():
                 hostname=self.hostname,
                 process_id=self.pid,
                 thread_id=self.tid,
-                exception=exception
+                exception=exception,
+                files=self.log_files
             )
             self.processor.process_record(logging_record)
 
@@ -237,14 +239,24 @@ class FusionLoggerBuilder():
         """
         return self.__logger
 
+    def write_to_file(self, path: str):
+        self.__logger.log_files.add(path)
+        return self
+
+    def write_to_files(self, *args: str):
+        paths = list(args)
+        for path in paths:
+            self.__logger.log_files.add(path)
+        return self
+
 
 if __name__ == "__main__":
     formatter = FusionLogFormatter("[{LEVEL}] {TIMESTAMP} [{NAME}] {MESSAGE}")
+    filepath = "logging_info.log"
     logger = (FusionLoggerBuilder()
               .set_formatter(formatter)
+              .set_name(__name__)
               .set_min_level(FusionLogLevel.DEBUG)
+              .write_to_file(filepath)
               .build())
-    logger.debug("Hallo")
-    logger.info("Hallo")
-    logger.warning("Hallo")
-    logger.critical("Hallo")
+    logger.warning("HELP ME, HELP THE WORLD")

@@ -144,6 +144,11 @@ class FusionLogRecord:
     Eventuell mitgelieferte Exception, die beim Logging aufgetreten ist.
     """
 
+    files: set[str]
+    """
+    Dateien, in die die Nachrichten geschrieben werden.
+    """
+
 
 class Token:
     """
