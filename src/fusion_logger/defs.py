@@ -254,6 +254,7 @@ class FormatToken(Token):
         elif self.key == self._thread_id_format:
             built += str(record.thread_id)  # Thread-ID (in String umgewandelt, falls nötig)
 
+
         else:
             built += "UNKNOWN_FORMAT"  # Unbekannter Format-Key, Standardausgabe
 
