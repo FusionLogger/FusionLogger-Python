@@ -1,4 +1,4 @@
-from .core import FusionLogger
+from .core import FusionLogger, FusionLoggerBuilder
 from .defs import FusionLogLevel, FusionLogRecord
 from .processors import FusionLogFormatter
 
@@ -7,4 +7,5 @@ __all__ = [
     'FusionLogRecord',
     'FusionLogLevel',
     'FusionLogFormatter',
+    'FusionLoggerBuilder',
 ]

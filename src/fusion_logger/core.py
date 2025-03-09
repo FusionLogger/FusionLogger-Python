@@ -250,7 +250,10 @@ class FusionLoggerBuilder():
         return self
 
 
+
 if __name__ == "__main__":
+    t = time.process_time()
+
     formatter = FusionLogFormatter("[{LEVEL}] {TIMESTAMP} [{NAME}] {MESSAGE}")
     filepath = "logging_info.log"
     logger = (FusionLoggerBuilder()
@@ -259,4 +262,10 @@ if __name__ == "__main__":
               .set_min_level(FusionLogLevel.DEBUG)
               .write_to_file(filepath)
               .build())
-    logger.warning("HELP ME, HELP THE WORLD")
+
+    for i in range(100000):
+        logger.warning("HELP ME, HELP THE WORLD")
+
+    # do some stuff
+    elapsed_time = time.process_time() - t
+    print(elapsed_time)
