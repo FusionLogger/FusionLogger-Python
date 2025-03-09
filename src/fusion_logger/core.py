@@ -15,9 +15,10 @@ It provides two main classes:
    - Allows dynamic configuration of the current logging scope and minimum log level.
 
 2. FusionLoggerBuilder:
-   - Implements a fluent builder pattern to facilitate the creation and configuration of fusion_logger
-     instances.
-   - Provides chainable methods for setting the logger name, minimum log level, and custom formatter.
+   - Implements a fluent builder pattern to facilitate the creation and configuration of
+     fusion_logger instances.
+   - Provides chainable methods for setting the logger name, minimum log level, and custom
+     formatter.
    - Finalizes and returns a fully configured fusion_logger instance using the build() method.
 
 Dependencies:
@@ -26,9 +27,10 @@ Dependencies:
     - FusionLogFormatter and FusionLogProcessor from the local 'processors' module.
 
 Usage:
-    Use fusion_logger for logging messages with rich contextual metadata and configurable behavior.
-    For ease of configuration, instantiate a FusionLoggerBuilder to set up the logger with the desired
-    properties and then build the logger instance.
+    Use fusion_logger for logging messages with rich contextual metadata and configurable
+    behavior.
+    For ease of configuration, instantiate a FusionLoggerBuilder to set up the logger with the
+    desired properties and then build the logger instance.
 """
 
 import os
@@ -40,7 +42,7 @@ from fusion_logger.defs import FusionLogLevel, FusionLogRecord
 from fusion_logger.processors import FusionLogFormatter, FusionLogProcessor
 
 
-class FusionLogger(object):
+class FusionLogger():
     """
     Zentrale Logging-Komponente mit konfigurierbaren Scopes und Leveln.
 
@@ -148,16 +150,18 @@ class FusionLogger(object):
         Raises:
             NotImplementedError: Bei direkter Verwendung der Basisklasse
         """
-        logging_record: FusionLogRecord = FusionLogRecord(
-            logger=self,
-            level=level,
-            message=message,
-            timestamp=time.time(),
-            hostname=self.hostname,
-            process_id=self.pid,
-            thread_id=self.tid,
-        )
-        self.processor.process_record(logging_record)
+        if self.__is_enabled(level):
+            logging_record: FusionLogRecord = FusionLogRecord(
+                logger=self,
+                level=level,
+                message=message,
+                timestamp=time.time(),
+                hostname=self.hostname,
+                process_id=self.pid,
+                thread_id=self.tid,
+                exception=exception
+            )
+            self.processor.process_record(logging_record)
 
     def __is_enabled(self, level: FusionLogLevel) -> bool:
         """
@@ -172,7 +176,7 @@ class FusionLogger(object):
         return level.value >= self.min_level.value
 
 
-class FusionLoggerBuilder(object):
+class FusionLoggerBuilder():
     """
     Fluent Builder für die Konfiguration von fusion_logger-Instanzen.
 
@@ -211,17 +215,17 @@ class FusionLoggerBuilder(object):
         self.__logger.min_level = level
         return self
 
-    def set_formatter(self, formatter: FusionLogFormatter):
+    def set_formatter(self, fusion_formatter: FusionLogFormatter):
         """
         Setzt benutzerdefinierten Log-Formatter.
 
         Args:
-            formatter: Formatter-Instanz
+            fusion_formatter: Formatter-Instanz
 
         Returns:
             FusionLoggerBuilder: Selbstreferenz für Method Chaining
         """
-        self.__logger.formatter = formatter
+        self.__logger.formatter = fusion_formatter
         return self
 
     def build(self):
@@ -236,7 +240,10 @@ class FusionLoggerBuilder(object):
 
 if __name__ == "__main__":
     formatter = FusionLogFormatter("[{LEVEL}] {TIMESTAMP} [{NAME}] {MESSAGE}")
-    logger = FusionLoggerBuilder().set_formatter(formatter).build()
+    logger = (FusionLoggerBuilder()
+              .set_formatter(formatter)
+              .set_min_level(FusionLogLevel.DEBUG)
+              .build())
     logger.debug("Hallo")
     logger.info("Hallo")
     logger.warning("Hallo")

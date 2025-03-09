@@ -2,59 +2,59 @@
 Module: defs
 -------------------
 
-This module provides fundamental definitions for a multi-level logging system.
-It includes two key components:
+Dieses Modul stellt grundlegende Definitionen für ein mehrstufiges Logging-System bereit.
+Es enthält zwei Hauptkomponenten:
 
 1. FusionLogLevel (Enum):
-   Defines the severity levels for log messages in the logging system.
-   Levels include:
-       - DEBUG: For detailed debugging information during development.
-       - INFO: For general system operations and informational messages.
-       - WARNING: For indicating potential issues that may require attention.
-       - CRITICAL: For severe errors that could impact system stability.
-   Each level is accompanied by a description of its typical use cases.
+   Definiert die Schweregrade für Logmeldungen im Logging-System.
+   Die Stufen beinhalten:
+       - DEBUG: Für detaillierte Debug-Informationen während der Entwicklung.
+       - INFO: Für allgemeine Systemoperationen und Informationsmeldungen.
+       - WARNING: Für potenzielle Probleme, die Aufmerksamkeit erfordern könnten.
+       - CRITICAL: Für schwerwiegende Fehler, die die Systemstabilität gefährden.
+   Zu jeder Stufe wird eine typische Einsatzbeschreibung angegeben.
 
 2. FusionLogRecord (dataclass):
-   Serves as a structured data container for log entries.
-   It encapsulates all relevant metadata associated with a log message, ensuring
-   a thread-safe format. The attributes include:
-       - logger (fusion_logger): The originating logger instance.
-       - level (FusionLogLevel): The severity level of the log event.
-       - message (str): The raw log message.
-       - timestamp (float): The Unix timestamp indicating when the log entry was created.
-       - hostname (str): The hostname of the system where the log was generated.
-       - process_id (int): The process ID of the generating process.
-       - thread_id (int): The thread ID of the generating thread.
+   Dient als strukturierter Datencontainer für Logeinträge.
+   Er fasst alle relevanten Metadaten eines Logeintrags zusammen und sorgt so für
+   ein threadsicheres Format. Zu den Attributen gehören:
+       - logger (fusion_logger): Die erzeugende Logger-Instanz.
+       - level (FusionLogLevel): Schweregrad des Log-Ereignisses.
+       - message (str): Die rohe Lognachricht.
+       - timestamp (float): Unix-Zeitstempel, wann der Logeintrag erstellt wurde.
+       - hostname (str): Name des Systems, auf dem der Logeintrag generiert wurde.
+       - process_id (int): Prozess-ID des erzeugenden Prozesses.
+       - thread_id (int): Thread-ID des erzeugenden Threads.
+       - exception (Exception): Bei Bedarf übergebene Exception.
 
 Dependencies:
-    - The standard libraries: 'dataclasses' and 'enum'.
-    - fusion_logger from the local 'core' module, which integrates with the overall logging system.
+    - Standardbibliotheken: 'dataclasses', 'datetime', 'enum' und 'typing'
+    - fusion_logger aus dem lokalen 'core'-Modul, welches in das Gesamtsystem integriert ist.
 """
+
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .core import FusionLogger  # nur für Typen
+    from .core import FusionLogger  # Nur für Typüberprüfungen
 
 
 class FusionLogLevel(Enum):
     """
-    Definiert die Schweregrade für Loggingmeldungen in einem mehrstufigen Logging-System.
+    Enumeration, die die Schweregrade für Logmeldungen definiert.
 
     Attributes:
         DEBUG: Niedrigste Stufe für Entwicklerdiagnosen
         INFO: Allgemeine Systeminformationen
-        WARNING: Potenzielle Probleme
+        WARNING: Potenzielle Problemstellen
         CRITICAL: Kritische Systemfehler
     """
 
     DEBUG = 0
     """
-    Verwendet für detaillierte Debug-Informationen während der Entwicklung.
-
-    Typische Anwendungen:
+    Detaillierte Debug-Informationen, etwa:
         - Variablenzustände
         - Ablaufverfolgung
         - Temporäre Diagnoseausgaben
@@ -62,105 +62,142 @@ class FusionLogLevel(Enum):
 
     INFO = 1
     """
-    Beschreibt reguläre Systemoperationen.
-
-    Wichtige Ereignisse:
+    Regelt allgemeine Systemoperationen, wie:
         - Erfolgreiche Transaktionen
-        - Systemstart/Shutdown
+        - Systemstart und -shutdown
         - Konfigurationsänderungen
     """
 
     WARNING = 2
     """
-    Kennzeichnet potenzielle Problemstellen.
-
-    Anwendungsfälle:
-        - Unerwartete aber behandelbare Zustände
+    Warnt vor möglichen, aber behandelbaren Problemen, etwa:
+        - Unerwartete Zustände
         - Deprecation-Hinweise
-        - Ressourcenengpässe
+        - Engpässe bei Ressourcen
     """
 
     CRITICAL = 3
     """
-    Dokumentiert schwerwiegende Systemfehler.
-
-    Wird verwendet bei:
-        - Nicht behandelbaren Ausnahmen
-        - Datenverlusten
-        - Kritischen Abhängigkeitsfehlern
+    Signalisiert schwerwiegende Fehler, bei denen:
+        - Nicht behandelbare Ausnahmen
+        - Datenverluste
+        - Kritische Abhängigkeitsfehler
+      auftreten können.
     """
 
 
 @dataclass
-class FusionLogRecord(object):
+class FusionLogRecord:
     """
     Datencontainer für strukturierte Logginginformationen.
 
-    Kapselt alle relevanten Metadaten und Inhalte eines Logeintrags
-    in einem threadsicheren Format.
+    Kapselt alle relevanten Metadaten eines Logeintrags in einem threadsicheren Format.
 
     Attributes:
-        logger (FusionLogger): Quell-Logger-Instanz
-        level (FusionLogLevel): Schweregrad des Ereignisses
-        message (str): Rohtextnachricht des Logeintrags
-        timestamp (float): Unix-Zeitstempel der Erstellung
-        hostname (str): Rechnername des Ursprungssystems
-        process_id (int): Prozesskennung des Erzeugers
-        thread_id (int): Threadkennung des Erzeugers
+        logger (FusionLogger): Referenz auf die erzeugende Logger-Instanz.
+        level (FusionLogLevel): Schweregrad des Log-Ereignisses.
+        message (str): Die Rohlognachricht.
+        timestamp (float): Unix-Zeitstempel der Erstellung.
+        hostname (str): Name des Systems, auf dem der Logeintrag erstellt wurde.
+        process_id (int): Prozess-ID des Erzeugers.
+        thread_id (int): Thread-ID des Erzeugers.
+        exception (Exception): Optional übergebene Exception.
     """
 
     logger: "FusionLogger"
     """
-    Referenz auf den erzeugenden Logger (automatisch gesetzt)
+    Referenz auf den Logger, der den Eintrag erzeugt hat.
     """
 
     level: FusionLogLevel
     """
-    Schweregrad des Ereignisses (DEBUG/INFO/WARNING/CRITICAL)
+    Schweregrad des Log-Ereignisses, z.B. DEBUG, INFO, WARNING oder CRITICAL.
     """
 
     message: str
     """
-    Unformatierte Originalnachricht des Logeintrags
+    Die ursprüngliche, unformatierte Nachricht des Logeintrags.
     """
 
     timestamp: float
     """
-    Erstellungszeitpunkt als Unix-Zeitstempel (UTC)
+    Erstellungszeitpunkt des Logeintrags als Unix-Zeitstempel (UTC).
     """
 
     hostname: str
     """
-    Hostname des erzeugenden Systems (automatisch gesetzt)
+    Name des Systems, auf dem der Logeintrag generiert wurde.
     """
 
     process_id: int
     """
-    PID des erzeugenden Prozesses (automatisch gesetzt)
+    Prozess-ID desjenigen Prozesses, der den Eintrag erzeugt hat.
     """
 
     thread_id: int
     """
-    TID des erzeugenden Threads (automatisch gesetzt)
+    Thread-ID desjenigen Threads, der den Eintrag erzeugt hat.
+    """
+
+    exception: Exception
+    """
+    Eventuell mitgelieferte Exception, die beim Logging aufgetreten ist.
     """
 
 
-class Token(object):
+class Token:
+    """
+    Abstrakte Basisklasse für Token, die in der Logformatierung verwendet werden.
+    """
 
     def apply(self, record: FusionLogRecord, built: str):
-        pass
+        """
+        Wendet das Token auf den übergebenen Logeintrag an und baut den formatierten String auf.
+
+        Args:
+            record (FusionLogRecord): Der Logeintrag, der formatiert werden soll.
+            built (str): Der bisher formatierte String.
+
+        Returns:
+            str: Der aktualisierte String nach Anwendung des Tokens.
+        """
+        pass  # Diese Methode dient als Platzhalter und sollte in abgeleiteten Klassen implementiert werden.
 
 
 class LiteralToken(Token):
+    """
+    Token, das einen Literalstring ohne weitere Formatierung direkt anhängt.
+    """
+
     def __init__(self, literal: str):
+        """
+        Initialisiert einen LiteralToken mit dem übergebenen Literalstring.
+
+        Args:
+            literal (str): Der Literalstring, der angehängt wird.
+        """
         self.literal = literal
 
     def apply(self, record: FusionLogRecord, built: str) -> str:
+        """
+        Hängt den Literalstring an den bereits gebauten String an.
+
+        Args:
+            record (FusionLogRecord): Der Logeintrag (wird hier nicht verwendet).
+            built (str): Der bisher formatierte String.
+
+        Returns:
+            str: Der String, erweitert um den Literalstring.
+        """
         built += self.literal
         return built
 
 
 class FormatToken(Token):
+    """
+    Token, das Platzhalter formatiert, indem es relevante Attribute aus einem Logeintrag extrahiert.
+    """
+
     _logger_name_format: str = "NAME"
     _logger_scope_format: str = "SCOPE"
     _level_format: str = "LEVEL"
@@ -171,25 +208,53 @@ class FormatToken(Token):
     _thread_id_format: str = "TID"
 
     def __init__(self, key: str):
+        """
+        Initialisiert einen FormatToken mit dem angegebenen Schlüssel.
+
+        Args:
+            key (str): Der Schlüssel, der angibt, welches Attribut aus dem Logeintrag formatiert werden soll.
+        """
         self.key = key
 
     def apply(self, record: FusionLogRecord, built: str) -> str:
-        if self.key.__eq__(self._logger_name_format):
-            built += record.logger.name
-        elif self.key.__eq__(self._logger_scope_format):
-            built += record.logger.scope
-        elif self.key.__eq__(self._timestamp_format):
+        """
+        Wendet das FormatToken an, indem es den entsprechenden Attributswert aus dem Logeintrag
+        an den bisherigen String anhängt.
+
+        Args:
+            record (FusionLogRecord): Der Logeintrag mit allen relevanten Metadaten.
+            built (str): Der bisher formatierte String.
+
+        Returns:
+            str: Der aktualisierte String nach Anwendung des FormatTokens.
+        """
+        # Überprüfe den Schlüssel und hänge den entsprechenden Wert an.
+        if self.key == self._logger_name_format:
+            built += record.logger.name  # Name des Loggers
+
+        elif self.key == self._logger_scope_format:
+            built += record.logger.scope  # Scope des Loggers
+
+        elif self.key == self._timestamp_format:
+            # Formatiere den Unix-Zeitstempel in ein lesbares Datum/Zeit-Format
             built += datetime.fromtimestamp(record.timestamp).strftime("%Y-%m-%d %H:%M:%S")
-        elif self.key.__eq__(self._level_format):
-            built += record.level.name[:4]
-        elif self.key.__eq__(self._hostname_format):
-            built += record.hostname
-        elif self.key.__eq__(self._message_format):
-            built += record.message
-        elif self.key.__eq__(self._process_id_format):
-            built += record.process_id
-        elif self.key.__eq__(self._thread_id_format):
-            built += record.thread_id
+
+        elif self.key == self._level_format:
+            built += record.level.name[:4]  # Verwende die ersten 4 Buchstaben des Schweregrads
+
+        elif self.key == self._hostname_format:
+            built += record.hostname  # Rechnername des Systems
+
+        elif self.key == self._message_format:
+            built += record.message  # Lognachricht
+
+        elif self.key == self._process_id_format:
+            built += str(record.process_id)  # Prozess-ID (in String umgewandelt, falls nötig)
+
+        elif self.key == self._thread_id_format:
+            built += str(record.thread_id)  # Thread-ID (in String umgewandelt, falls nötig)
+
         else:
-            built += "UNKNOWN_FORMAT"
+            built += "UNKNOWN_FORMAT"  # Unbekannter Format-Key, Standardausgabe
+
         return built
