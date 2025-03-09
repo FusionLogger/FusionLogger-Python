@@ -1,15 +1,48 @@
+"""
+Module: core
+---------------------
+
+This module implements a flexible and configurable logging component for Python applications.
+It provides two main classes:
+
+1. fusion_logger:
+   - The central logging component that supports configurable scopes and log levels.
+   - Automatically gathers system metadata such as hostname, process ID, and current thread ID.
+   - Supports logging methods at various levels (debug, info, warning, critical) by creating
+     FusionLogRecord instances enriched with metadata.
+   - Delegates log record processing to a FusionLogProcessor, and formats log entries using a
+     FusionLogFormatter.
+   - Allows dynamic configuration of the current logging scope and minimum log level.
+
+2. FusionLoggerBuilder:
+   - Implements a fluent builder pattern to facilitate the creation and configuration of
+     fusion_logger instances.
+   - Provides chainable methods for setting the logger name, minimum log level, and custom
+     formatter.
+   - Finalizes and returns a fully configured fusion_logger instance using the build() method.
+
+Dependencies:
+    - os, socket, threading, and time from the standard library.
+    - FusionLogLevel and FusionLogRecord from the local 'defs' module.
+    - FusionLogFormatter and FusionLogProcessor from the local 'processors' module.
+
+Usage:
+    Use fusion_logger for logging messages with rich contextual metadata and configurable
+    behavior.
+    For ease of configuration, instantiate a FusionLoggerBuilder to set up the logger with the
+    desired properties and then build the logger instance.
+"""
+
 import os
 import socket
 import threading
 import time
 
-from FusionLogFormatter import FusionLogFormatter
-from FusionLogLevel import FusionLogLevel
-from FusionLogProcessor import FusionLogProcessor
-from FusionLogger.FusionLogRecord import FusionLogRecord
+from fusion_logger.defs import FusionLogLevel, FusionLogRecord
+from fusion_logger.processors import FusionLogFormatter, FusionLogProcessor
 
 
-class FusionLogger(object):
+class FusionLogger():
     """
     Zentrale Logging-Komponente mit konfigurierbaren Scopes und Leveln.
 
@@ -26,8 +59,8 @@ class FusionLogger(object):
         """
         self.name: str = FusionLogger.__name__
         self.scope: str = ""
-        self.min_level: FusionLogLevel = FusionLogLevel.Info
-        self.formatter: FusionLogFormatter = FusionLogFormatter()
+        self.min_level: FusionLogLevel = FusionLogLevel.INFO
+        self.formatter: FusionLogFormatter = FusionLogFormatter("")
         self.processor: FusionLogProcessor = FusionLogProcessor()
         self.hostname: str = socket.gethostname()
         self.pid: int = os.getpid()
@@ -43,7 +76,7 @@ class FusionLogger(object):
             message: Zu loggende Textnachricht
             exception: Optionales Exception-Objekt (Standard: None)
         """
-        self.__log(FusionLogLevel.Debug, message, exception)
+        self.__log(FusionLogLevel.DEBUG, message, exception)
 
     def info(self, message: str, exception: Exception = None) -> None:
         """
@@ -53,7 +86,7 @@ class FusionLogger(object):
             message: Zu loggende Textnachricht
             exception: Optionales Exception-Objekt (Standard: None)
         """
-        self.__log(FusionLogLevel.Info, message, exception)
+        self.__log(FusionLogLevel.INFO, message, exception)
 
     def warning(self, message: str, exception: Exception = None) -> None:
         """
@@ -63,7 +96,7 @@ class FusionLogger(object):
             message: Zu loggende Textnachricht
             exception: Optionales Exception-Objekt (Standard: None)
         """
-        self.__log(FusionLogLevel.Warning, message, exception)
+        self.__log(FusionLogLevel.WARNING, message, exception)
 
     def critical(self, message: str, exception: Exception = None) -> None:
         """
@@ -73,7 +106,7 @@ class FusionLogger(object):
             message: Zu loggende Textnachricht
             exception: Optionales Exception-Objekt (Standard: None)
         """
-        self.__log(FusionLogLevel.Critical, message, exception)
+        self.__log(FusionLogLevel.CRITICAL, message, exception)
 
     def begin_scope(self, scope: str) -> None:
         """
@@ -117,16 +150,18 @@ class FusionLogger(object):
         Raises:
             NotImplementedError: Bei direkter Verwendung der Basisklasse
         """
-        logging_record: FusionLogRecord = FusionLogRecord(
-            logger=self,
-            level=level,
-            message=message,
-            timestamp=time.time(),
-            hostname=self.hostname,
-            process_id=self.pid,
-            thread_id=self.tid,
-        )
-        self.processor.enqueue_record(logging_record)
+        if self.__is_enabled(level):
+            logging_record: FusionLogRecord = FusionLogRecord(
+                logger=self,
+                level=level,
+                message=message,
+                timestamp=time.time(),
+                hostname=self.hostname,
+                process_id=self.pid,
+                thread_id=self.tid,
+                exception=exception
+            )
+            self.processor.process_record(logging_record)
 
     def __is_enabled(self, level: FusionLogLevel) -> bool:
         """
@@ -141,9 +176,9 @@ class FusionLogger(object):
         return level.value >= self.min_level.value
 
 
-class FusionLoggerBuilder(object):
+class FusionLoggerBuilder():
     """
-    Fluent Builder für die Konfiguration von FusionLogger-Instanzen.
+    Fluent Builder für die Konfiguration von fusion_logger-Instanzen.
 
     Ermöglicht method chaining für einfache Logger-Erstellung.
     """
@@ -180,17 +215,17 @@ class FusionLoggerBuilder(object):
         self.__logger.min_level = level
         return self
 
-    def set_formatter(self, formatter: FusionLogFormatter):
+    def set_formatter(self, fusion_formatter: FusionLogFormatter):
         """
         Setzt benutzerdefinierten Log-Formatter.
 
         Args:
-            formatter: Formatter-Instanz
+            fusion_formatter: Formatter-Instanz
 
         Returns:
             FusionLoggerBuilder: Selbstreferenz für Method Chaining
         """
-        self.__logger.formatter = formatter
+        self.__logger.formatter = fusion_formatter
         return self
 
     def build(self):
@@ -201,3 +236,15 @@ class FusionLoggerBuilder(object):
             FusionLogger: Vollständig konfigurierter Logger
         """
         return self.__logger
+
+
+if __name__ == "__main__":
+    formatter = FusionLogFormatter("[{LEVEL}] {TIMESTAMP} [{NAME}] {MESSAGE}")
+    logger = (FusionLoggerBuilder()
+              .set_formatter(formatter)
+              .set_min_level(FusionLogLevel.DEBUG)
+              .build())
+    logger.debug("Hallo")
+    logger.info("Hallo")
+    logger.warning("Hallo")
+    logger.critical("Hallo")
