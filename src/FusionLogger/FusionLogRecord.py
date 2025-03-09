@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from FusionLogger.FusionLogger import FusionLogger
 from FusionLogger.FusionLogLevel import FusionLogLevel
+from FusionLogger.FusionLogger import FusionLogger
 
 
 @dataclass
@@ -10,3 +10,7 @@ class FusionLogRecord(object):
     level: FusionLogLevel
     message: str
     timestamp: float
+    hostname: str
+    process_id : int
+    thread_id: int
+

@@ -1,139 +1,203 @@
-import inspect
 import os
 import socket
 import threading
+import time
 
-from FusionLogLevel import FusionLogLevel
 from FusionLogFormatter import FusionLogFormatter
+from FusionLogLevel import FusionLogLevel
+from FusionLogProcessor import FusionLogProcessor
+from FusionLogger.FusionLogRecord import FusionLogRecord
+
 
 class FusionLogger(object):
-    """ TODO """
+    """
+    Zentrale Logging-Komponente mit konfigurierbaren Scopes und Leveln.
+
+    Attributes:
+        name (str): Logger-Identifikation (Standard: Klassenname)
+        scope (str): Aktiver Logging-Kontextbereich
+        min_level (FusionLogLevel): Minimale Ausgabestufe für Logs
+        formatter (FusionLogFormatter): Formatierungskomponente für Logeinträge
+    """
 
     def __init__(self):
-        """ TODO """
-
+        """
+        Initialisiert Logger mit Systemmetadaten und Defaultwerten.
+        """
         self.name: str = FusionLogger.__name__
-        """ TODO """
-
         self.scope: str = ""
-        """ TODO """
-
         self.min_level: FusionLogLevel = FusionLogLevel.Info
-        """ TODO """
-
-        self._formatter: FusionLogFormatter = FusionLogFormatter()
-        """ TODO """
-
-        self.__hostname: str = socket.gethostname()
-        """ TODO """
-
-        self.__pid: int = os.getpid()
-        """ TODO """
-
-        self.__tid: int = threading.current_thread().ident
-        """ TODO """
+        self.formatter: FusionLogFormatter = FusionLogFormatter()
+        self.processor: FusionLogProcessor = FusionLogProcessor()
+        self.hostname: str = socket.gethostname()
+        self.pid: int = os.getpid()
+        self.tid: int = threading.current_thread().ident
 
     # Outer methods
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
     def debug(self, message: str, exception: Exception = None) -> None:
-        """ TODO """
+        """
+        Loggt eine Nachricht auf DEBUG-Level.
+
+        Args:
+            message: Zu loggende Textnachricht
+            exception: Optionales Exception-Objekt (Standard: None)
+        """
         self.__log(FusionLogLevel.Debug, message, exception)
 
     def info(self, message: str, exception: Exception = None) -> None:
-        """ TODO """
+        """
+        Loggt eine Nachricht auf INFO-Level.
+
+        Args:
+            message: Zu loggende Textnachricht
+            exception: Optionales Exception-Objekt (Standard: None)
+        """
         self.__log(FusionLogLevel.Info, message, exception)
 
     def warning(self, message: str, exception: Exception = None) -> None:
-        """ TODO """
+        """
+        Loggt eine Nachricht auf WARNING-Level.
+
+        Args:
+            message: Zu loggende Textnachricht
+            exception: Optionales Exception-Objekt (Standard: None)
+        """
         self.__log(FusionLogLevel.Warning, message, exception)
 
     def critical(self, message: str, exception: Exception = None) -> None:
-        """ TODO """
+        """
+        Loggt eine Nachricht auf CRITICAL-Level.
+
+        Args:
+            message: Zu loggende Textnachricht
+            exception: Optionales Exception-Objekt (Standard: None)
+        """
         self.__log(FusionLogLevel.Critical, message, exception)
 
     def begin_scope(self, scope: str) -> None:
-        """ TODO """
-        pass
+        """
+        Aktiviert einen neuen Logging-Kontextbereich.
+
+        Args:
+            scope: Name des neuen Kontextbereichs
+        """
+        self.scope = scope
 
     def end_scope(self, scope: str) -> None:
-        """ TODO """
-        pass
+        """
+        Beendet den aktuellen Logging-Kontextbereich.
+
+        Args:
+            scope: Name des zu schließenden Bereichs (Prüfung auf Konsistenz)
+        """
+        if self.scope == scope:
+            self.scope = ""
 
     def set_min_level(self, min_level: FusionLogLevel) -> None:
+        """
+        Setzt die minimale Ausgabestufe für Logs.
+
+        Args:
+            min_level: Neue Mindeststufe als FusionLogLevel-Enum
+        """
         self.min_level = min_level
 
     # Inner methods
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
     def __log(self, level: FusionLogLevel, message: str, exception: Exception):
-        """ TODO """
-        pass
+        """
+        Interner Logging-Mechanismus (muss implementiert werden).
 
-    def __is_enabled (self, level: FusionLogLevel) -> bool:
-        """ TODO """
-        pass
+        Args:
+            level: Gewünschtes Log-Level
+            message: Zu loggende Nachricht
+            exception: Optionale Exception-Referenz
+
+        Raises:
+            NotImplementedError: Bei direkter Verwendung der Basisklasse
+        """
+        logging_record: FusionLogRecord = FusionLogRecord(
+            logger=self,
+            level=level,
+            message=message,
+            timestamp=time.time(),
+            hostname=self.hostname,
+            process_id=self.pid,
+            thread_id=self.tid,
+        )
+        self.processor.enqueue_record(logging_record)
+
+    def __is_enabled(self, level: FusionLogLevel) -> bool:
+        """
+        Prüft, ob Logging für angegebenes Level aktiviert ist.
+
+        Args:
+            level: Zu prüfendes Log-Level
+
+        Returns:
+            bool: True wenn Logging erlaubt, sonst False
+        """
+        return level.value >= self.min_level.value
+
 
 class FusionLoggerBuilder(object):
-    """ TODO """
+    """
+    Fluent Builder für die Konfiguration von FusionLogger-Instanzen.
+
+    Ermöglicht method chaining für einfache Logger-Erstellung.
+    """
 
     def __init__(self):
-        """ TODO """
+        """
+        Initialisiert Builder mit Standard-Loggerkonfiguration.
+        """
         self.__logger = FusionLogger()
 
     def set_name(self, name: str):
-        """ TODO """
+        """
+        Setzt den Logger-Namen.
+
+        Args:
+            name: Eindeutiger Identifikator für den Logger
+
+        Returns:
+            FusionLoggerBuilder: Selbstreferenz für Method Chaining
+        """
         self.__logger.name = name
         return self
 
     def set_min_level(self, level: FusionLogLevel):
-        """ TODO """
+        """
+        Konfiguriert die minimale Log-Stufe.
+
+        Args:
+            level: Gewünschte Mindeststufe
+
+        Returns:
+            FusionLoggerBuilder: Selbstreferenz für Method Chaining
+        """
         self.__logger.min_level = level
         return self
 
     def set_formatter(self, formatter: FusionLogFormatter):
-        """ TODO """
-        self.__logger.Formatter = formatter
+        """
+        Setzt benutzerdefinierten Log-Formatter.
+
+        Args:
+            formatter: Formatter-Instanz
+
+        Returns:
+            FusionLoggerBuilder: Selbstreferenz für Method Chaining
+        """
+        self.__logger.formatter = formatter
         return self
 
     def build(self):
-        """ TODO """
+        """
+        Erzeugt final konfigurierte Logger-Instanz.
+
+        Returns:
+            FusionLogger: Vollständig konfigurierter Logger
+        """
         return self.__logger
-
-
-def caller_info(skip=2):
-    """Get the name of a caller in the format module.class.method.
-    Copied from: https://gist.github.com/techtonik/2151727
-    :arguments:
-        - skip (integer): Specifies how many levels of stack
-                          to skip while getting caller name.
-                          skip=1 means "who calls me",
-                          skip=2 "who calls my caller" etc.
-    :returns:
-        - package (string): caller package.
-        - module (string): caller module.
-    """
-    stack = inspect.stack()
-    start = 0 + skip
-    if len(stack) < start + 1:
-        return ''
-    parentframe = stack[start][0]
-
-    # module and packagename.
-    module: str = ""
-    module_info = inspect.getmodule(parentframe)
-    if module_info:
-        module = module_info.__name__
-
-    # Remove reference to frame
-    # See: https://docs.python.org/3/library/inspect.html#the-interpreter-stack
-    del parentframe
-    return module
-
-
-def deepened():
-    print(caller_info())
-
-
-if __name__ == "__main__":
-    deepened()

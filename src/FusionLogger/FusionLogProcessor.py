@@ -1,6 +1,5 @@
-import queue
-from queue import Queue
 import threading
+from queue import Queue
 
 from FusionLogRecord import FusionLogRecord
 
@@ -16,7 +15,6 @@ class SingletonMeta(type):
 
     _instances = {}
     _lock = threading.Lock()
-
 
     def __call__(cls, *args, **kwargs):
         """
@@ -43,26 +41,26 @@ class FusionLogProcessor(metaclass=SingletonMeta):
     Verwaltet eine Verarbeitungswarteschlange und einen Hintergrundthread.
 
     Attributes:
-        queue (Queue): Threadsichere Nachrichtenwarteschlange
-        thread (ProcessingThread): Verarbeitungsthread für LogRecords
+        _queue (Queue): Threadsichere Nachrichtenwarteschlange
+        _thread (ProcessingThread): Verarbeitungsthread für LogRecords
     """
-
 
     def __init__(self) -> None:
         """
         Initialisiert Warteschlange und startet Verarbeitungsthread.
         """
-        self.queue = Queue()
-        self.thread = self.ProcessingThread(self.queue)
-        self.thread.start()
+        self._queue = Queue()
+        self._thread = self.ProcessingThread(self._queue)
+        self._thread.start()
 
+    def enqueue_record(self, logging_record):
+        self._queue.put(logging_record)
 
     def kill_thread(self) -> None:
         """
         Stoppt den Verarbeitungsthread sicher.
         """
-        self.thread.stop()
-
+        self._thread.stop()
 
     class ProcessingThread(threading.Thread):
         """
@@ -75,7 +73,6 @@ class FusionLogProcessor(metaclass=SingletonMeta):
         """
         _lock = threading.Lock()
 
-
         def __init__(self, record_queue: Queue) -> None:
             """
             Initialisiert Thread mit gegebener Warteschlange.
@@ -87,7 +84,6 @@ class FusionLogProcessor(metaclass=SingletonMeta):
             self.queue = record_queue
             self.stop_event = threading.Event()
 
-
         def run(self):
             """
             Hauptschleife für kontinuierliche Verarbeitung von LogRecords.
@@ -95,11 +91,10 @@ class FusionLogProcessor(metaclass=SingletonMeta):
             while not self.stop_event.is_set():
                 with self._lock:
                     record: FusionLogRecord = self.queue.get()
-                    out: str = self.process_record(record)
+                    out:str = record.logger.formatter.format(record)
                     print(out)
 
-
-        def process_record(self, record) -> str:
+        def process_record(self, record: FusionLogRecord) -> str:
             """
             Verarbeitet einzelne LogRecords (muss überschrieben werden).
 
@@ -113,7 +108,6 @@ class FusionLogProcessor(metaclass=SingletonMeta):
                 NotImplementedError: Wenn nicht überschrieben
             """
             raise NotImplementedError("process_record muss in Subklassen implementiert werden")
-
 
         def stop(self):
             """Signalisiert dem Thread, sich sicher zu beenden."""
