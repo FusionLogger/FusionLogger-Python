@@ -1,7 +1,15 @@
 import threading
 from queue import Queue
 
-from FusionLogRecord import FusionLogRecord
+from .defs import FusionLogRecord
+
+
+class FusionLogFormatter(object):
+    def __init__(self):
+        pass
+
+    def format(self, record: FusionLogRecord) -> str:
+        return f"Formatted: {record.message}"
 
 
 class SingletonMeta(type):
@@ -91,7 +99,7 @@ class FusionLogProcessor(metaclass=SingletonMeta):
             while not self.stop_event.is_set():
                 with self._lock:
                     record: FusionLogRecord = self.queue.get()
-                    out:str = record.logger.formatter.format(record)
+                    out: str = record.logger.formatter.format(record)
                     print(out)
 
         def process_record(self, record: FusionLogRecord) -> str:

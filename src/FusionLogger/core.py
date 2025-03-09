@@ -3,10 +3,10 @@ import socket
 import threading
 import time
 
-from FusionLogFormatter import FusionLogFormatter
-from FusionLogLevel import FusionLogLevel
-from FusionLogProcessor import FusionLogProcessor
-from FusionLogger.FusionLogRecord import FusionLogRecord
+from .defs import FusionLogLevel
+from .defs import FusionLogRecord
+from .processors import FusionLogFormatter
+from .processors import FusionLogProcessor
 
 
 class FusionLogger(object):
@@ -26,7 +26,7 @@ class FusionLogger(object):
         """
         self.name: str = FusionLogger.__name__
         self.scope: str = ""
-        self.min_level: FusionLogLevel = FusionLogLevel.Info
+        self.min_level: FusionLogLevel = FusionLogLevel.INFO
         self.formatter: FusionLogFormatter = FusionLogFormatter()
         self.processor: FusionLogProcessor = FusionLogProcessor()
         self.hostname: str = socket.gethostname()
@@ -43,7 +43,7 @@ class FusionLogger(object):
             message: Zu loggende Textnachricht
             exception: Optionales Exception-Objekt (Standard: None)
         """
-        self.__log(FusionLogLevel.Debug, message, exception)
+        self.__log(FusionLogLevel.DEBUG, message, exception)
 
     def info(self, message: str, exception: Exception = None) -> None:
         """
@@ -53,7 +53,7 @@ class FusionLogger(object):
             message: Zu loggende Textnachricht
             exception: Optionales Exception-Objekt (Standard: None)
         """
-        self.__log(FusionLogLevel.Info, message, exception)
+        self.__log(FusionLogLevel.INFO, message, exception)
 
     def warning(self, message: str, exception: Exception = None) -> None:
         """
@@ -63,7 +63,7 @@ class FusionLogger(object):
             message: Zu loggende Textnachricht
             exception: Optionales Exception-Objekt (Standard: None)
         """
-        self.__log(FusionLogLevel.Warning, message, exception)
+        self.__log(FusionLogLevel.WARNING, message, exception)
 
     def critical(self, message: str, exception: Exception = None) -> None:
         """
@@ -73,7 +73,7 @@ class FusionLogger(object):
             message: Zu loggende Textnachricht
             exception: Optionales Exception-Objekt (Standard: None)
         """
-        self.__log(FusionLogLevel.Critical, message, exception)
+        self.__log(FusionLogLevel.CRITICAL, message, exception)
 
     def begin_scope(self, scope: str) -> None:
         """
