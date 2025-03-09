@@ -6,91 +6,99 @@ import threading
 from FusionLogLevel import FusionLogLevel
 from FusionLogFormatter import FusionLogFormatter
 
-
 class FusionLogger(object):
     """ TODO """
 
     def __init__(self):
         """ TODO """
 
-        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        # Fundamental attributes
-        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-        self.Name: str = FusionLogger.__name__
+        self.name: str = FusionLogger.__name__
         """ TODO """
 
-        self.Scope: str = ""
+        self.scope: str = ""
         """ TODO """
 
-        self.MinLogLevel: FusionLogLevel = FusionLogLevel.Info
+        self.min_level: FusionLogLevel = FusionLogLevel.Info
         """ TODO """
 
-        self._Formatter: FusionLogFormatter = FusionLogFormatter()
+        self._formatter: FusionLogFormatter = FusionLogFormatter()
         """ TODO """
 
-        self.__HostName: str = socket.gethostname()
+        self.__hostname: str = socket.gethostname()
         """ TODO """
 
-        self.__ProcessID: int = os.getpid()
+        self.__pid: int = os.getpid()
         """ TODO """
 
-        self.__ThreadID: int = threading.current_thread().ident
+        self.__tid: int = threading.current_thread().ident
         """ TODO """
 
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # Fundamental methods
+    # Outer methods
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    def debug(self, message):
+    def debug(self, message: str, exception: Exception = None) -> None:
+        """ TODO """
+        self.__log(FusionLogLevel.Debug, message, exception)
+
+    def info(self, message: str, exception: Exception = None) -> None:
+        """ TODO """
+        self.__log(FusionLogLevel.Info, message, exception)
+
+    def warning(self, message: str, exception: Exception = None) -> None:
+        """ TODO """
+        self.__log(FusionLogLevel.Warning, message, exception)
+
+    def critical(self, message: str, exception: Exception = None) -> None:
+        """ TODO """
+        self.__log(FusionLogLevel.Critical, message, exception)
+
+    def begin_scope(self, scope: str) -> None:
+        """ TODO """
         pass
 
-    def info(self, message):
+    def end_scope(self, scope: str) -> None:
+        """ TODO """
         pass
 
-    def warning(self, message: str, exception: Exception):
-        pass
+    def set_min_level(self, min_level: FusionLogLevel) -> None:
+        self.min_level = min_level
 
-    def critical(self, message: str, exception: Exception):
-        pass
-
-    def begin_scope(self, scope: str):
-        pass
-
-    def end_scope(self, scope: str):
-        pass
-
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Inner methods
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     def __log(self, level: FusionLogLevel, message: str, exception: Exception):
-        """
-
-        """
-
-        # Erstellung des
+        """ TODO """
         pass
 
+    def __is_enabled (self, level: FusionLogLevel) -> bool:
+        """ TODO """
+        pass
 
 class FusionLoggerBuilder(object):
+    """ TODO """
+
     def __init__(self):
-        self.Logger = FusionLogger()
+        """ TODO """
+        self.__logger = FusionLogger()
 
     def set_name(self, name: str):
-        self.Logger.Name = name
+        """ TODO """
+        self.__logger.name = name
         return self
 
-    def set_loglevel(self, level: FusionLogLevel):
-        self.Logger.MinLogLevel = level
+    def set_min_level(self, level: FusionLogLevel):
+        """ TODO """
+        self.__logger.min_level = level
         return self
 
     def set_formatter(self, formatter: FusionLogFormatter):
-        self.Logger.Formatter = formatter
+        """ TODO """
+        self.__logger.Formatter = formatter
         return self
 
     def build(self):
-        return self.Logger
+        """ TODO """
+        return self.__logger
 
 
 def caller_info(skip=2):
@@ -112,22 +120,19 @@ def caller_info(skip=2):
     parentframe = stack[start][0]
 
     # module and packagename.
-    package: str = ""
     module: str = ""
     module_info = inspect.getmodule(parentframe)
     if module_info:
-        mod = module_info.__name__.split('.')
-        package: str = mod[0]
-        module: str = mod[1]
+        module = module_info.__name__
 
     # Remove reference to frame
     # See: https://docs.python.org/3/library/inspect.html#the-interpreter-stack
     del parentframe
-    return package, module
+    return module
 
 
 def deepened():
-    FusionLogger.module_from_stack()
+    print(caller_info())
 
 
 if __name__ == "__main__":
