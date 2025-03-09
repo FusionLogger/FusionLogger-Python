@@ -1,21 +1,47 @@
 import threading
 from queue import Queue
 
-from .defs import FusionLogRecord
+from .defs import FusionLogRecord, Token, LiteralToken, FormatToken
 
 
 class FusionLogFormatter(object):
     def __init__(self, template: str):
-        self.tokens: list = FusionLogFormatter.parse_template(template)
+        self.tokens: list[Token] = parse_template(template)
 
-    @staticmethod
-    def parse_template(template: str) -> list:
-        tokens: list = list()
-        position: int = 0
-        while position < len(template):
-            start: int = template.find("{", position)
-            if (start == -1):
+    def apply_template(self, record: FusionLogRecord) -> str:
+        out: str = ""
+        for token in self.tokens:
+            out = token.apply(record, out)
+        return out
 
+
+
+def parse_template(template: str) -> list:
+    tokens: list = list()
+    position: int = 0
+    while position < len(template):
+        start: int = template.find("{", position)
+
+        # Restlicher Text ist Literal-Token
+        if start == -1:
+            tokens.append(LiteralToken(template[position:]))
+            break
+
+        # Text bis Format-Identifier ist Literaltoken
+        if start > position:
+            tokens.append(LiteralToken(template[position:start]))
+
+        end: int = template.find("}", start)
+
+        # Wenn kein Ende gefunden ganzer Resttext Literal
+        if end == -1:
+            list.append(tokens, LiteralToken(template[start:]))
+            break
+
+        key = template[start + 1:end]
+        tokens.append(FormatToken(key))
+        position = end + 1
+    return tokens
 
 
 class SingletonMeta(type):
@@ -74,5 +100,5 @@ class FusionLogProcessor(metaclass=SingletonMeta):
         Raises:
             NotImplementedError: Wenn nicht überschrieben
         """
-        out: str = record.logger.formatter.apply(record)
+        out: str = record.logger.formatter.apply_template(record)
         print(out)

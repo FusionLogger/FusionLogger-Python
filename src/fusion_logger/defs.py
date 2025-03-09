@@ -31,6 +31,7 @@ Dependencies:
     - fusion_logger from the local 'core' module, which integrates with the overall logging system.
 """
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -146,7 +147,7 @@ class FusionLogRecord(object):
 
 class Token(object):
 
-    def apply(self, template: str):
+    def apply(self, record: FusionLogRecord, built: str):
         pass
 
 
@@ -154,33 +155,41 @@ class LiteralToken(Token):
     def __init__(self, literal: str):
         self.literal = literal
 
-    def apply(self, template: str) -> str:
-        template += self.literal
-        return template
+    def apply(self, record: FusionLogRecord, built: str) -> str:
+        built += self.literal
+        return built
 
 
 class FormatToken(Token):
-    __datetime_format: str = "DATETIME"
+    _logger_name_format: str = "NAME"
+    _logger_scope_format: str = "SCOPE"
+    _level_format: str = "LEVEL"
+    _hostname_format: str = "HOSTNAME"
+    _message_format: str = "MESSAGE"
+    _timestamp_format: str = "TIMESTAMP"
+    _process_id_format: str = "PID"
+    _thread_id_format: str = "TID"
 
     def __init__(self, key: str):
         self.key = key
 
-    def apply(self, template: str):
-        match (self.key):
-            case __datetime_format:
-                pass
-            case __datetime_format:
-                pass
-            case __datetime_format:
-                pass
-            case __datetime_format:
-                pass
-            case __datetime_format:
-                pass
-            case __datetime_format:
-                pass
-            case __datetime_format:
-                pass
-            case __datetime_format:
-                pass
-        return template
+    def apply(self, record: FusionLogRecord, built: str) -> str:
+        if self.key.__eq__(self._logger_name_format):
+            built += record.logger.name
+        elif self.key.__eq__(self._logger_scope_format):
+            built += record.logger.scope
+        elif self.key.__eq__(self._timestamp_format):
+            built += datetime.fromtimestamp(record.timestamp).strftime("%Y-%m-%d %H:%M:%S")
+        elif self.key.__eq__(self._level_format):
+            built += record.level.name[:4]
+        elif self.key.__eq__(self._hostname_format):
+            built += record.hostname
+        elif self.key.__eq__(self._message_format):
+            built += record.message
+        elif self.key.__eq__(self._process_id_format):
+            built += record.process_id
+        elif self.key.__eq__(self._thread_id_format):
+            built += record.thread_id
+        else:
+            built += "UNKNOWN_FORMAT"
+        return built

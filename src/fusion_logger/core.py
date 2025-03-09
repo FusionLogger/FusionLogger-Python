@@ -58,7 +58,7 @@ class FusionLogger(object):
         self.name: str = FusionLogger.__name__
         self.scope: str = ""
         self.min_level: FusionLogLevel = FusionLogLevel.INFO
-        self.formatter: FusionLogFormatter = FusionLogFormatter()
+        self.formatter: FusionLogFormatter = FusionLogFormatter("")
         self.processor: FusionLogProcessor = FusionLogProcessor()
         self.hostname: str = socket.gethostname()
         self.pid: int = os.getpid()
@@ -235,21 +235,9 @@ class FusionLoggerBuilder(object):
 
 
 if __name__ == "__main__":
-    logger: FusionLogger = FusionLoggerBuilder().build()
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
-    logger.info("Hello World")
+    formatter = FusionLogFormatter("[{LEVEL}] {TIMESTAMP} [{NAME}] {MESSAGE}")
+    logger = FusionLoggerBuilder().set_formatter(formatter).build()
+    logger.debug("Hallo")
+    logger.info("Hallo")
+    logger.warning("Hallo")
+    logger.critical("Hallo")
