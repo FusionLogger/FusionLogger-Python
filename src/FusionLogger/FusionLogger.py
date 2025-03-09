@@ -1,17 +1,42 @@
 import inspect
-import sys
-from types import FrameType
-from typing import cast
+import os
+import socket
+import threading
 
 from FusionLogLevel import FusionLogLevel
 from FusionLogFormatter import FusionLogFormatter
 
 
 class FusionLogger(object):
+    """ TODO """
 
     def __init__(self):
-        self.MinLogLevel = FusionLogLevel.Info
-        self.Formatter = FusionLogFormatter()
+        """ TODO """
+
+        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        # Fundamental attributes
+        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        self.Name: str = FusionLogger.__name__
+        """ TODO """
+
+        self.Scope: str = ""
+        """ TODO """
+
+        self.MinLogLevel: FusionLogLevel = FusionLogLevel.Info
+        """ TODO """
+
+        self._Formatter: FusionLogFormatter = FusionLogFormatter()
+        """ TODO """
+
+        self.__HostName: str = socket.gethostname()
+        """ TODO """
+
+        self.__ProcessID: int = os.getpid()
+        """ TODO """
+
+        self.__ThreadID: int = threading.current_thread().ident
+        """ TODO """
 
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Fundamental methods
