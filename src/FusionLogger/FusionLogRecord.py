@@ -25,6 +25,7 @@ class FusionLogRecord(object):
     logger: FusionLogger
     """
     Referenz auf den erzeugenden Logger (automatisch gesetzt)
+    
     """
 
     level: FusionLogLevel
