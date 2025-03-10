@@ -5,6 +5,9 @@ build-backend = "hatchling.build"
 [project]
 name = "fusion_logger_python"
 version = "1.0.0"
+dependencies = [
+  "colorama",
+]
 authors = [
     { name = "Lasse-Leander Hillen", email = "lassehillen@gmx.de" },
 ]

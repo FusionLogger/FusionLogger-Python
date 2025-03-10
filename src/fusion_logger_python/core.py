@@ -37,8 +37,8 @@ import socket
 import threading
 import time
 
-from fusion_logger_python.defs import FusionLogLevel, FusionLogRecord
-from fusion_logger_python.processors import FusionLogFormatter, FusionLogProcessor
+from .defs import FusionLogLevel, FusionLogRecord
+from .processors import FusionLogFormatter, FusionLogProcessor
 
 
 class FusionLogger:

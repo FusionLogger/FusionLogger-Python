@@ -62,14 +62,15 @@ class MyTestCase(unittest.TestCase):
         self.benchmark_output("Benchmark-1.000.000 Calls", 1_000_000, elapsed)
 
     def benchmark_output(self, name: str, runs: int, elapsed: float) -> None:
-        self.benchmark_logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++")
+        self.benchmark_logger.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++")
         self.benchmark_logger.info("| Benchmarking...")
-        self.benchmark_logger.info("| Name: " + name)
-        self.benchmark_logger.info("| Elapsed time: " + str(elapsed))
-        self.benchmark_logger.info("| Avg. time per call: " + str(elapsed / runs))
+        self.benchmark_logger.warning("| Name: " + name)
+        self.benchmark_logger.critical("| Elapsed time: " + str(elapsed))
+        self.benchmark_logger.debug("| Avg. time per call: " + str(elapsed / runs))
         self.benchmark_logger.info("| Avg. msg per sec: " + str(runs / elapsed))
-        self.benchmark_logger.info("+++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+        self.benchmark_logger.warning("+++++++++++++++++++++++++++++++++++++++++++++++++++\n")
 
 
 if __name__ == '__main__':
+
     unittest.main()
