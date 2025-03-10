@@ -22,7 +22,7 @@ FusionLogger-Python is a centralized logging framework that provides configurabl
 Install FusionLogger-Python via pip:
 
 ```bash
-pip install fusion_logger_lasse27
+pip install fusion_logger_python
 ```
 
 ## Usage
@@ -30,14 +30,14 @@ pip install fusion_logger_lasse27
 A simple usage example can be found in the provided `TestBenchmark.py` file. Here is a brief example of how to initialize and use the logger:
 
 ```python
-from fusion_logger import FusionLoggerBuilder, FusionLogLevel
+from fusion_logger_python import FusionLoggerBuilder, FusionLogLevel
 
 # Build and configure the logger
-logger = FusionLoggerBuilder() \
-    .set_name("MyAppLogger") \
-    .set_min_level(FusionLogLevel.DEBUG) \
-    .write_to_file("app.log") \
-    .build()
+logger = FusionLoggerBuilder()
+.set_name("MyAppLogger")
+.set_min_level(FusionLogLevel.DEBUG)
+.write_to_file("app.log")
+.build()
 
 # Log messages at different levels
 logger.debug("This is a debug message.")

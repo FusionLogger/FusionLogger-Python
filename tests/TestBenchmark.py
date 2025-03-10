@@ -3,7 +3,7 @@ import unittest
 from os import system
 
 import helpers
-from fusion_logger import FusionLogFormatter, FusionLogLevel, FusionLoggerBuilder
+from fusion_logger_python import FusionLogFormatter, FusionLogLevel, FusionLoggerBuilder
 
 cls = lambda: system('cls')
 cls()

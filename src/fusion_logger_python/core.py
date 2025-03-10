@@ -37,8 +37,8 @@ import socket
 import threading
 import time
 
-from fusion_logger.defs import FusionLogLevel, FusionLogRecord
-from fusion_logger.processors import FusionLogFormatter, FusionLogProcessor
+from fusion_logger_python.defs import FusionLogLevel, FusionLogRecord
+from fusion_logger_python.processors import FusionLogFormatter, FusionLogProcessor
 
 
 class FusionLogger:
@@ -59,7 +59,7 @@ class FusionLogger:
         self.name: str = FusionLogger.__name__
         self.scope: str = ""
         self.min_level: FusionLogLevel = FusionLogLevel.INFO
-        self.formatter: FusionLogFormatter = FusionLogFormatter("")
+        self.formatter: FusionLogFormatter = FusionLogFormatter("[{LEVEL}] {TIMESTAMP} [{NAME}] {MESSAGE}")
         self.processor: FusionLogProcessor = FusionLogProcessor()
         self.hostname: str = socket.gethostname()
         self.pid: int = os.getpid()
@@ -176,7 +176,7 @@ class FusionLogger:
 
 class FusionLoggerBuilder:
     """
-    Fluent builder for configuring fusion_logger instances.
+    Fluent builder for configuring fusion_logger_python instances.
 
     Allows method chaining for easy logger creation.
     """

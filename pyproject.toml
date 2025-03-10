@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "fusion_logger_lasse27"
+name = "fusion_logger_python"
 version = "1.0.0"
 authors = [
     { name = "Lasse-Leander Hillen", email = "lassehillen@gmx.de" },
