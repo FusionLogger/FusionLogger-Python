@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fusion_logger_lasse27"
+version = "1.0.0"
+authors = [
+    { name = "Lasse-Leander Hillen", email = "lassehillen@gmx.de" },
+]
+maintainers = [
+    { name = "Lasse-Leander Hillen", email = "lassehillen@gmx.de" },
+]
+description = """
+    Fusion Logger is a centralized logging framework that provides configurable log
+    levels and dynamic scopes for fine-grained control over application logging. It
+    features structured log records, flexible template-based formatting via tokens,
+    and a fluent builder for easy logger configuration.
+    """
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+keywords = ["logging", "formatting"]
+
+[project.urls]
+Homepage = "https://github.com/FusionLogger/FusionLogger-Python"
+Documentation = "https://github.com/FusionLogger/FusionLogger-Python/wiki"
+Repository = "https://github.com/FusionLogger/FusionLogger-Python"
+Issues = "https://github.com/FusionLogger/FusionLogger-Python/issues"
+Changelog = "https://github.com/FusionLogger/FusionLogger-Python/releases"
