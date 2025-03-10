@@ -38,7 +38,7 @@ and the FusionLogProcessor ensures that log messages are handled in a thread-saf
 
 import threading
 
-import colorama
+from colorama import Style, Fore
 
 from .defs import FusionLogRecord, Token, LiteralToken, FormatToken, FusionLogLevel
 
@@ -173,13 +173,13 @@ class FusionLogProcessor(metaclass=SingletonMeta):
         out: str = record.logger.formatter.apply_template(record)
         match record.level:
             case FusionLogLevel.DEBUG:
-                print(f"{colorama.Fore.CYAN}{out}{colorama.Style.RESET_ALL}")
+                print(f"{Fore.CYAN}{out}{Style.RESET_ALL}")
             case FusionLogLevel.INFO:
                 print(out)
             case FusionLogLevel.WARNING:
-                print(f"{colorama.Fore.YELLOW}{out}{colorama.Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}{out}{Style.RESET_ALL}")
             case FusionLogLevel.CRITICAL:
-                print(f"{colorama.Fore.RED}{out}{colorama.Style.RESET_ALL}")
+                print(f"{Fore.RED}{out}{Style.RESET_ALL}")
         for file in record.files:
             with open(file, "a", encoding="utf-8") as opened_file:
                 opened_file.write(out)
