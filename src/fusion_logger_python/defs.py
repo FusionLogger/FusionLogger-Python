@@ -251,32 +251,23 @@ class FormatToken(Token):
         # Check the key and append the corresponding value.
         if self.key == self._logger_name_format:
             built += record.logger.name
-
         elif self.key == self._logger_scope_format:
             built += record.logger.scope
-
         elif self.key == self._timestamp_format:
             if record.logger.formatter.datetime_format is None:
                 built += datetime.fromtimestamp(record.timestamp).strftime("%Y-%m-%d %H:%M:%S")
             else:
                 built += datetime.fromtimestamp(record.timestamp).strftime(record.logger.formatter.datetime_format)
-
         elif self.key == self._level_format:
             built += record.level.name[:4]
-
         elif self.key == self._hostname_format:
             built += record.hostname
-
         elif self.key == self._message_format:
             built += record.message
-
         elif self.key == self._process_id_format:
             built += str(record.process_id)
-
         elif self.key == self._thread_id_format:
             built += str(record.thread_id)
-
         else:
             built += "UNKNOWN_FORMAT"
-
         return built
