@@ -1,6 +1,6 @@
 """
-Module: fusion_logger_module
-
+Module: core
+---------------
 This module provides a centralized logging framework with configurable scopes and levels,
 allowing applications to log messages with different severities and custom output destinations.
 It integrates system metadata (such as hostname, process ID, and thread ID) into each log record
@@ -8,18 +8,15 @@ and supports dynamic log scoping.
 
 Key Components:
 ----------------
-1. FusionLogger:
+1. FusionLogger: \r\n
    - A core logging class that handles logging at various levels (DEBUG, INFO, WARNING, CRITICAL).
    - Maintains system information (hostname, process ID, thread ID) and a set of file paths for logging output.
    - Supports setting a logging scope via the `begin_scope` and `end_scope` methods.
    - Uses a FusionLogProcessor to process log records and a FusionLogFormatter to format them.
    - The internal method `__log` creates a FusionLogRecord with the provided information and delegates
      processing to the FusionLogProcessor.
-   - **Note:** The docstring for the `__log` method mentions that a NotImplementedError should be raised
-     if the base class is used directly. However, the implementation does not raise this error. Could you
-     clarify whether this behavior is intentional or if the method is expected to be overridden in subclasses?
 
-2. FusionLoggerBuilder:
+2. FusionLoggerBuilder: \r\n
    - Implements a fluent builder pattern to simplify the configuration of FusionLogger instances.
    - Provides chainable methods to set the logger’s name, minimum logging level, custom formatter, and
      file output paths (both individually and in batches).

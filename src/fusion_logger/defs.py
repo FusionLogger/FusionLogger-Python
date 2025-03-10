@@ -1,3 +1,49 @@
+"""
+Module: defs
+---------------
+This module defines core constructs for the logging system, including severity levels,
+a structured log record, and token classes for dynamic log formatting. It is designed
+to encapsulate both the data structure for log entries and the mechanisms to transform
+these entries into formatted strings.
+
+Key Components:
+---------------
+1. FusionLogLevel (Enum): \n
+   - Enumerates the logging severity levels: DEBUG, INFO, WARNING, and CRITICAL.
+   - Each level is associated with an integer value to determine its hierarchy.
+   - Detailed docstrings explain the intended usage and examples for each level.
+
+2. FusionLogRecord (Data Class): \n
+   - Serves as a structured container for log entries.
+   - Encapsulates metadata such as the logger instance, log level, raw message,
+     timestamp (in Unix format), hostname, process ID, thread ID, an optional exception,
+     and a set of file paths where the log may be written.
+   - Designed for thread-safe usage when handling log records.
+
+3. Token (Abstract Base Class): \n
+   - Acts as a base for tokens used in log formatting.
+   - Defines the method `apply` which should be overridden in derived classes to
+     manipulate a log record and build a formatted log string.
+
+4. LiteralToken (Subclass of Token): \n
+   - Implements a token that appends a fixed literal string to the formatted log output.
+   - Primarily used for inserting static text into log formats.
+
+5. FormatToken (Subclass of Token): \n
+   - Processes dynamic placeholders by extracting corresponding attributes from a log record.
+   - Supports tokens for logger name, scope, timestamp (with support for custom date-time formats),
+     level (abbreviated to the first four characters), hostname, message, process ID, and thread ID.
+   - Falls back to a default value ("UNKNOWN_FORMAT") if an unrecognized key is provided.
+
+Usage:
+------
+This module is intended to work in tandem with the rest of the logging system. Log entries are
+first encapsulated in a FusionLogRecord, then transformed into a formatted string via a series of
+tokens (LiteralToken and FormatToken) defined here. The design supports extensibility for creating
+additional token types if further customization is needed.
+"""
+
+import abc
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
@@ -122,7 +168,9 @@ class Token:
 
     Provides a placeholder for applying tokens to log records.
     """
+    __metaclass__ = abc.ABCMeta
 
+    @abc.abstractmethod
     def apply(self, record: FusionLogRecord, built: str) -> str:
         """
         Applies the token to the given log record and builds the formatted string.
