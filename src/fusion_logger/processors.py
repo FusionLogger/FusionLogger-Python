@@ -4,9 +4,10 @@ from queue import Queue
 from .defs import FusionLogRecord, Token, LiteralToken, FormatToken
 
 
-class FusionLogFormatter(object):
-    def __init__(self, template: str):
+class FusionLogFormatter:
+    def __init__(self, template: str, datetime_format: str = None):
         self.tokens: list[Token] = parse_template(template)
+        self.datetime_format = datetime_format
 
     def apply_template(self, record: FusionLogRecord) -> str:
         out: str = ""
