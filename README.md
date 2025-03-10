@@ -22,7 +22,7 @@ FusionLogger-Python is a centralized logging framework that provides configurabl
 Install FusionLogger-Python via pip:
 
 ```bash
-pip install fusion_logger_python
+pip install fusion-logger-python
 ```
 
 ## Usage
